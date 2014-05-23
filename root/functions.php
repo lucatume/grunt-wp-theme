@@ -15,6 +15,7 @@
  // Useful global constants
 define( '{%= prefix_caps %}_VERSION', '0.1.0' );
 define( '{%= prefix_caps %}_PATH', dirname(__FILE__) );
+define( '{%= prefix_caps %}_URL', get_template_directory_uri() );
 
  
  /**
