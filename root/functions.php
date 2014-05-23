@@ -14,6 +14,8 @@
  
  // Useful global constants
 define( '{%= prefix_caps %}_VERSION', '0.1.0' );
+define( '{%= prefix_caps %}_PATH', dirname(__FILE__) );
+
  
  /**
   * Set up theme defaults and register supported WordPress features.
