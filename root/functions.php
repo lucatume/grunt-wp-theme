@@ -3,6 +3,15 @@
 namespace {%= prefix %};
 
 /**
+ * Composer autoloader
+ */
+require_once 'vendor/autoload.php';
+
+use tad\interfaces\FunctionsAdapter;
+use tad\adapterts\Functions;
+use tad\utils\Script;
+
+/**
  * {%= title %} functions and definitions
  *
  * When using a child theme (see http://codex.wordpress.org/Theme_Development and
@@ -14,52 +23,91 @@ namespace {%= prefix %};
  * @package {%= title %}
  * @since 0.1.0
  */
- 
+
  // Useful global constants
 define( '{%= prefix_caps %}_VERSION', '0.1.0' );
 define( '{%= prefix_caps %}_PATH', dirname(__FILE__) );
-define( '{%= prefix_caps %}_URL', get_template_directory_uri() );
+define( '{%= prefix_caps %}_URI', get_template_directory_uri() );
 
- 
- /**
-  * Set up theme defaults and register supported WordPress features.
-  *
-  * @uses load_theme_textdomain() For translation/localization support.
-  *
-  * @since 0.1.0
-  */
- function {%= prefix %}_setup() {
-	/**
-	 * Makes {%= title %} available for translation.
-	 *
-	 * Translations can be added to the /lang directory.
-	 * If you're building a theme based on {%= title %}, use a find and replace
-	 * to change '{%= prefix %}' to the name of your theme in all template files.
-	 */
-	load_theme_textdomain( '{%= prefix %}', get_template_directory() . '/languages' );
- }
- add_action( 'after_setup_theme', '{%= prefix %}_setup' );
- 
- /**
-  * Enqueue scripts and styles for front-end.
-  *
-  * @since 0.1.0
-  */
- function {%= prefix %}_scripts_styles() {
-	$postfix = ( defined( 'SCRIPT_DEBUG' ) && true === SCRIPT_DEBUG ) ? '' : '.min';
+/**
+ * The main theme class
+ */
+class Theme
+{
+    const VERSION = {%= prefix_caps %}_VERSION;
+    const PATH = {%= prefix_caps %}_PATH;
+    const URI = {%= prefix_caps %}_URI;
+    const JS_URI = {%= prefix_caps %}_URI . '/assets/js';
+    const CSS_URI = {%= prefix_caps %}_URI . '/assets/css';
+    const PREFIX = {%= prefix %};
+    /**
+     * An instance of the theme class, meant to be singleton.
+     *
+     * @var {%= prefix %}\Theme
+     */
+    private static $instance = null;
+    /**
+     * The global functions adapter used to isolate the class.
+     *
+     * @var tad\adapters\Functions or a mock object.
+     */
+    private $f = null;
 
-	wp_enqueue_script( '{%= prefix %}', get_template_directory_uri() . "/assets/js/{%= js_safe_name %}{$postfix}.js", array(), {%= prefix_caps %}_VERSION, true );
-		
-	wp_enqueue_style( '{%= prefix %}', get_template_directory_uri() . "/assets/css/{%= js_safe_name %}{$postfix}.css", array(), {%= prefix_caps %}_VERSION );
- }
- add_action( 'wp_enqueue_scripts', '{%= prefix %}_scripts_styles' );
- 
- /**
-  * Add humans.txt to the <head> element.
-  */
- function {%= prefix %}_header_meta() {
-	$humans = '<link type="text/plain" rel="author" href="' . get_template_directory_uri() . '/humans.txt" />';
-	
-	echo apply_filters( '{%= prefix %}_humans', $humans );
- }
- add_action( 'wp_head', '{%= prefix %}_header_meta' );
+    public function __construct(\tad\interfaces\FunctionsAdapter $f = null){
+        $f || $this->$f = new Functions();
+    }
+
+    public static function init(){
+        if (self::$instance == null) {
+            self::$instance = new self();
+        }
+        $this->hook();
+    }
+
+    public function hook()
+    {
+        $this->f->add_action( 'after_setup_theme', array($this, 'setup') );
+        $this->f->add_action( 'wp_enqueue_scripts', array($this, 'enqueueScriptsAndStyles') );
+        $this->f->add_action( 'wp_head', array($this, 'filterHeaderMeta') );
+    }
+     /**
+      * Set up theme defaults and register supported WordPress features.
+      *
+      * @uses load_theme_textdomain() For translation/localization support.
+      *
+      * @since 0.1.0
+      */
+     public function setup() {
+        /**
+         * Makes {%= title %} available for translation.
+         *
+         * Translations can be added to the /lang directory.
+         */
+        load_theme_textdomain( self::PREFIX, self::PATH . '/languages' );
+    }
+     /**
+      * Enqueue scripts and styles for front-end.
+      *
+      * @since 0.1.0
+      */
+     function enqueueScriptsAndStyles() {
+       wp_enqueue_script( self::PREFIX, Script::suffix(self::JS_URI . "/{%= js_safe_name %}.js"), array(), null, true );
+
+       wp_enqueue_style( self::PREFIX, Script::suffix(self::CSS_URI . "/{%= js_safe_name %}.css"), array(), null );
+    }
+
+     /**
+      * Add humans.txt to the <head> element.
+      */
+     function filterHeaderMeta() {
+       $humans = '<link type="text/plain" rel="author" href="' . self::URI . '/humans.txt" />';
+
+       echo apply_filters( '{%= prefix %}_humans', $humans );
+    }
+}
+
+/**
+ * Kickstart the theme
+ */
+Theme::init();
+
