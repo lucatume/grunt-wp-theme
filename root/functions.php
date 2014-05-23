@@ -1,4 +1,7 @@
 <?php
+
+namespace {%= title %};
+
 /**
  * {%= title %} functions and definitions
  *
