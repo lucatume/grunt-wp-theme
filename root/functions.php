@@ -1,6 +1,6 @@
 <?php
 
-namespace {%= title %};
+namespace {%= prefix %};
 
 /**
  * {%= title %} functions and definitions
