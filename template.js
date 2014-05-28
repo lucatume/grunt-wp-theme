@@ -30,6 +30,11 @@ exports.template = function( grunt, init, done ) {
 			message: 'PHP function prefix (alpha and underscore characters only)',
 			default: 'wptheme'
 		},
+		{
+            name: 'namespace',
+            message: 'PHP namespace (alpha and underscore characters only)',
+            default: 'wpplugin'
+        },
 		init.prompt( 'description', 'The best WordPress theme ever made!' ),
 		init.prompt( 'homepage', 'http://wordpress.org/themes' ),
 		init.prompt( 'author_name' ),
