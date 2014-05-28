@@ -1,26 +1,11 @@
 {
-    "name": "lucatume/{%= prefix %}",
-    "type": "wordpress-theme",
-    "description": "{%= description %}",
-    "keywords": ["wordpress", "theme"],
-    "homepage": "http://theAverageDev.com",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "theAverageDev (Luca Tumedei)",
-            "email": "luca@theaveragedev.com",
-            "homepage": "http://theaveragedev.com",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": ">=5.3.0",
+    "require":{
         "lucatume/tdd-helpers": "dev-master",
         "lucatume/wp-utils": "dev-master"
     },
     "autoload": {
         "psr-0": {
-            "{%= prefix %}\\": "src/"
+            "{%= namespace %}\\": "src/"
         }
     }
 }

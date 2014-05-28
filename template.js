@@ -104,14 +104,24 @@ exports.template = function( grunt, init, done ) {
 		}
 		
 		console.log( files );
-		
-		// Actually copy and process files
-		init.copyAndProcess( files, props );
-		
-		// Generate package.json file
-		init.writePackageJSON( 'package.json', props );
-		
-		// Done!
-		done();
+		// rename the src/theme folder to src/prefix
+        // hint from PeteAUK at:
+        // http://stackoverflow.com/questions/11852283/rename-templates-folders-with-a-gruntjs-custom-init-task
+        var files = init.filesToCopy(props),
+            folder_name = 'src/' + props.namespace + '/' + props.prefix;
+        for (var file in files) {
+            if (file.indexOf('src/theme/') > -1) {
+                var path = files[file],
+                    newFile = file.replace('src/theme/', folder_name + '/');
+                files[newFile] = path;
+                delete files[file];
+            }
+        }
+        // Actually copy and process files
+        init.copyAndProcess(files, props);
+        // Generate package.json file
+        init.writePackageJSON('package.json', props);
+        // Done!
+        done();
 	});
 };
